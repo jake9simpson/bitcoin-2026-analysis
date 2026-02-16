@@ -1,0 +1,13 @@
+[     598ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:8766/favicon.ico:0
+[   41113ms] Uncaught TypeError: Cannot read properties of null (reading 'x')
+    at x (https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js:12:2250)
+    at M (https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js:12:2534)
+    at parseObjectData (https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js:18:53562)
+    at parse (https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js:18:52837)
+    at _insertElements (https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js:18:59088)
+    at _resyncElements (https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js:18:58811)
+    at buildOrUpdateElements (https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js:18:52274)
+    at update (https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js:18:94771)
+    at An (https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js:18:90938)
+    at <anonymous> (http://127.0.0.1:8766/index.html:1000:2)
+    at <anonymous> (http://127.0.0.1:8766/index.html:875:78)
