@@ -3634,8 +3634,8 @@ createChartOnReveal('drawdownTrajectoryChart', function(ctx) {
   var c2 = [0, -18, -30, -40, -55, -71, -65, -62, -60, -58, -55, -57, -60, -65, -70, -75, -80, -85, -84];
   var c3 = [0, -10, -22, -35, -55, -70, -60, -65, -63, -65, -67, -68, -70, -75, -80, -84, -83, -82, null];
   var c4 = [0, -7, -12, -18, -28, -51, -45, -48, -50, -52, -55, -57, -60, -65, -70, -75, -77, -76, null];
-  var c5 = [0, -5, -8, -15, -24, -32, -41, -45, null, null, null, null, null, null, null, null, null, null, null];
-  var c5proj = [null, null, null, null, null, null, null, -45, -48, -52, -55, -58, -62, -65, -68, -70, -70, -68, null];
+  var c5 = [0, -5, -8, -15, -24, -32, -41, -52, null, null, null, null, null, null, null, null, null, null, null];
+  var c5proj = [null, null, null, null, null, null, null, -52, -55, -58, -60, -62, -65, -67, -68, -70, -70, -68, null];
 
   function dsLine(label, color, data, width, dash) {
     return {
@@ -3682,11 +3682,11 @@ createChartOnReveal('drawdownTrajectoryChart', function(ctx) {
         annotation: {
           annotations: {
             youAreHere: {
-              type: 'point', xValue: 133, yValue: -45,
+              type: 'point', xValue: 133, yValue: -52,
               backgroundColor: CC.cyan, borderColor: '#fff', borderWidth: 2, radius: 7
             },
             hereLabel: {
-              type: 'label', xValue: 133, yValue: -45,
+              type: 'label', xValue: 133, yValue: -52,
               content: ['YOU ARE HERE', 'Day 133, -52%'],
               backgroundColor: 'rgba(6,182,212,0.15)', color: CC.cyan,
               font: { family: "'JetBrains Mono'", size: 10, weight: '600' },
@@ -3754,11 +3754,12 @@ createChartOnReveal('logRegressionChart', function(ctx) {
   var btcPrice = [315, 650, 19783, 3200, 7200, 8821, 69044, 15476, 42000, 64969, 126198, 69000, null];
 
   // Use absolute fill targets to avoid issues with Chart.js draw order reordering
-  function bandDef(label, data, fillTarget, color) {
+  // Boosted alpha values (2.5x) for visibility against ultra-dark #050508 background
+  function bandDef(label, data, fillTarget, fillColor, borderClr) {
     return {
-      label: label, data: data, fill: { target: fillTarget, above: color, below: color },
-      backgroundColor: color,
-      borderColor: 'transparent', borderWidth: 0, pointRadius: 0, tension: 0.4
+      label: label, data: data, fill: { target: fillTarget, above: fillColor, below: fillColor },
+      backgroundColor: fillColor,
+      borderColor: borderClr, borderWidth: 0.5, pointRadius: 0, tension: 0.4
     };
   }
 
@@ -3767,18 +3768,18 @@ createChartOnReveal('logRegressionChart', function(ctx) {
     data: {
       labels: labels,
       datasets: [
-        bandDef('+2 SD "SELL!"', bandPlus2, 1, 'rgba(239,68,68,0.18)'),
-        bandDef('+1.5 SD "Bubble?"', bandPlus1_5, 2, 'rgba(239,68,68,0.13)'),
-        bandDef('+1 SD "Caution"', bandPlus1, 3, 'rgba(249,115,22,0.14)'),
-        bandDef('+0.5 SD "HODL"', bandPlus05, 4, 'rgba(245,158,11,0.14)'),
-        bandDef('Fair Value', fairValue, 5, 'rgba(139,92,246,0.14)'),
-        bandDef('-0.5 SD "Undervalued"', bandMinus05, 6, 'rgba(16,185,129,0.14)'),
-        bandDef('-1 SD "Still Cheap"', bandMinus1, 7, 'rgba(59,130,246,0.14)'),
-        bandDef('-1.5 SD "Accumulate"', bandMinus1_5, 8, 'rgba(59,130,246,0.10)'),
+        bandDef('+2 SD "SELL!"', bandPlus2, 1, 'rgba(239,68,68,0.40)', 'rgba(239,68,68,0.35)'),
+        bandDef('+1.5 SD "Bubble?"', bandPlus1_5, 2, 'rgba(239,68,68,0.30)', 'rgba(239,68,68,0.25)'),
+        bandDef('+1 SD "Caution"', bandPlus1, 3, 'rgba(249,115,22,0.32)', 'rgba(249,115,22,0.25)'),
+        bandDef('+0.5 SD "HODL"', bandPlus05, 4, 'rgba(245,158,11,0.32)', 'rgba(245,158,11,0.25)'),
+        bandDef('Fair Value', fairValue, 5, 'rgba(139,92,246,0.32)', 'rgba(139,92,246,0.25)'),
+        bandDef('-0.5 SD "Undervalued"', bandMinus05, 6, 'rgba(16,185,129,0.32)', 'rgba(16,185,129,0.25)'),
+        bandDef('-1 SD "Still Cheap"', bandMinus1, 7, 'rgba(59,130,246,0.32)', 'rgba(59,130,246,0.25)'),
+        bandDef('-1.5 SD "Accumulate"', bandMinus1_5, 8, 'rgba(59,130,246,0.25)', 'rgba(59,130,246,0.20)'),
         {
           label: '-2 SD "Fire Sale"', data: bandMinus2, fill: 'origin',
-          backgroundColor: 'rgba(30,58,138,0.10)', borderColor: 'transparent',
-          borderWidth: 0, pointRadius: 0, tension: 0.4
+          backgroundColor: 'rgba(30,58,138,0.22)', borderColor: 'rgba(30,58,138,0.20)',
+          borderWidth: 0.5, pointRadius: 0, tension: 0.4
         },
         {
           label: 'BTC Price', data: btcPrice, borderColor: '#eaeaf0', backgroundColor: 'transparent',
@@ -4719,6 +4720,7 @@ var revealObserver = new IntersectionObserver(function(entries) {
   entries.forEach(function(entry) {
     if (entry.isIntersecting) {
       entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
     }
   });
 }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
@@ -4731,23 +4733,28 @@ document.querySelectorAll('.reveal').forEach(function(el) {
 // ============================================================
 // SCROLL PROGRESS BAR & NAV ACTIVE STATE
 // ============================================================
+// Cache DOM queries for scroll performance (called on every scroll event)
+var _scrollProgress = document.getElementById('scrollProgress');
+var _navEl = document.getElementById('nav');
+var _sections = document.querySelectorAll('section[id]');
+var _navLinksAll = document.querySelectorAll('.nav-links a');
+
 function onScroll() {
   var s = window.scrollY;
   var d = document.documentElement.scrollHeight - window.innerHeight;
   var progress = d > 0 ? (s / d) * 100 : 0;
-  document.getElementById('scrollProgress').style.width = progress + '%';
+  _scrollProgress.style.width = progress + '%';
 
-  var nav = document.getElementById('nav');
-  if (s > 50) nav.classList.add('scrolled');
-  else nav.classList.remove('scrolled');
+  if (s > 50) _navEl.classList.add('scrolled');
+  else _navEl.classList.remove('scrolled');
 
   var pos = s + 120;
-  document.querySelectorAll('section[id]').forEach(function(sec) {
+  _sections.forEach(function(sec) {
     var t = sec.offsetTop;
     var h = sec.offsetHeight;
     var id = sec.getAttribute('id');
     if (pos >= t && pos < t + h) {
-      document.querySelectorAll('.nav-links a').forEach(function(a) {
+      _navLinksAll.forEach(function(a) {
         a.classList.remove('active');
         if (a.getAttribute('href') === '#' + id) a.classList.add('active');
       });
