@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050508">
 <title>Bitcoin 2026: Anatomy of a 52% Decline | Premium Analysis</title>
 <meta name="description" content="Data-driven analysis of Bitcoin's 52% drawdown from $126,198 to $60,062. Interactive charts, on-chain metrics, insider quotes, and risk assessment.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script type="text/javascript" src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script defer src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 <style>
 /* ============================================================
    BITCOIN 2026 ANALYSIS — ULTRA-BLACK THEME
@@ -83,6 +84,7 @@
 /* ---- Base ---- */
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 130px;
   font-size: 16px;
 }
 
@@ -396,11 +398,165 @@ body {
 }
 
 /* ===========================================================
+   LIVE TICKER
+   =========================================================== */
+.live-ticker {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  height: 36px;
+  background: rgba(5, 5, 8, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  transition: opacity 0.4s ease;
+}
+
+.live-ticker.loading {
+  opacity: 0.5;
+}
+
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.ticker-label {
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.625rem;
+  letter-spacing: 0.05em;
+}
+
+.ticker-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ticker-value.up { color: var(--bullish); }
+.ticker-value.down { color: var(--bearish); }
+.ticker-value.neutral { color: var(--text-primary); }
+.ticker-value.extreme-fear { color: var(--bearish); }
+.ticker-value.fear { color: #f97316; }
+.ticker-value.greed { color: var(--bullish); }
+
+.ticker-change {
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.ticker-change.up { color: var(--bullish); }
+.ticker-change.down { color: var(--bearish); }
+
+.ticker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bullish);
+  animation: tickerPulse 2s ease-in-out infinite;
+}
+
+.ticker-dot.live { background: var(--bullish); }
+.ticker-dot.stale { background: var(--warning); animation: none; }
+.ticker-dot.offline { background: var(--bearish); animation: none; }
+
+@keyframes tickerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.ticker-status {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .live-ticker {
+    gap: 16px;
+    padding: 0 12px;
+    font-size: 0.6875rem;
+  }
+  .ticker-item:nth-child(n+5) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .live-ticker {
+    gap: 12px;
+  }
+  .ticker-item:nth-child(n+4) {
+    display: none;
+  }
+  .ticker-label {
+    display: none;
+  }
+}
+
+/* ===========================================================
+   SNAPSHOT BANNER — point-in-time indicator
+   =========================================================== */
+.snapshot-banner {
+  background: linear-gradient(90deg, rgba(247, 147, 26, 0.06) 0%, rgba(247, 147, 26, 0.12) 50%, rgba(247, 147, 26, 0.06) 100%);
+  border-bottom: 1px solid rgba(247, 147, 26, 0.15);
+  padding: 10px 24px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  margin-top: 100px; /* Clear fixed nav (64px) + ticker (36px) */
+}
+
+.snapshot-banner strong {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.snapshot-banner .snapshot-date {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.snapshot-banner .snapshot-sep {
+  color: var(--text-muted);
+  margin: 0 8px;
+}
+
+@media (max-width: 600px) {
+  .snapshot-banner {
+    font-size: 0.75rem;
+    padding: 8px 16px;
+  }
+}
+
+/* ===========================================================
    LAYOUT
    =========================================================== */
 section {
   padding: var(--space-15) var(--space-3);
   position: relative;
+  scroll-margin-top: 130px;
+}
+
+section:first-of-type {
+  scroll-margin-top: 130px;
 }
 
 .container {
@@ -429,6 +585,38 @@ section {
   margin: 0 auto 64px;
   text-align: center;
   padding: 48px 32px;
+  scroll-margin-top: 130px;
+}
+
+/* First chapter intro needs extra top padding to clear the fixed navbar + ticker + snapshot banner */
+.nav + .section-divider + .chapter-intro {
+  padding-top: 60px;
+}
+.nav + .live-ticker + .section-divider + .chapter-intro {
+  padding-top: 60px;
+}
+.nav + .live-ticker + .snapshot-banner + .section-divider + .chapter-intro {
+  padding-top: 60px;
+}
+.snapshot-banner + .section-divider + .chapter-intro {
+  padding-top: 60px;
+}
+
+.chapter-number {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  margin-bottom: 12px;
+}
+
+.chapter-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
 }
 
 .chapter-intro h2 {
@@ -455,7 +643,7 @@ section {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding-top: 80px;
+  padding-top: 140px;
   background:
     linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, transparent 50%),
     radial-gradient(ellipse at 50% 0%, rgba(247, 147, 26, 0.07) 0%, transparent 60%),
@@ -1396,7 +1584,7 @@ footer a:hover {
    =========================================================== */
 @media (max-width: 480px) {
   section {
-    padding: 56px var(--space-1);
+    padding: 72px var(--space-1);
   }
 
   .stat-card {
@@ -1446,6 +1634,7 @@ footer a:hover {
   }
 }
 </style>
+<noscript><style>.reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
 </head>
 <body>
 
@@ -1459,7 +1648,7 @@ footer a:hover {
       </svg>
       BTC<span>2026</span>
     </div>
-    <button class="nav-mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">
+    <button class="nav-mobile-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks" onclick="var n=document.querySelector('.nav-links');n.classList.toggle('open');this.setAttribute('aria-expanded',n.classList.contains('open'))">
       <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
     </button>
     <div class="nav-links" id="navLinks">
@@ -1491,6 +1680,7 @@ footer a:hover {
           <a href="#halving">Halving Analysis</a>
           <a href="#drawdowns">Drawdowns</a>
           <a href="#onchain">On-Chain</a>
+          <a href="#network-health">Network Health</a>
           <a href="#bottoming">Bottoming Signals</a>
         </div>
       </div>
@@ -1515,6 +1705,40 @@ footer a:hover {
   <div class="scroll-progress" id="scrollProgress"></div>
 </nav>
 
+<!-- LIVE TICKER -->
+<div class="live-ticker loading" id="liveTicker">
+  <div class="ticker-item">
+    <div class="ticker-dot live" id="tickerDot"></div>
+    <span class="ticker-status" id="tickerStatus">Connecting...</span>
+  </div>
+  <div class="ticker-item">
+    <span class="ticker-label">BTC</span>
+    <span class="ticker-value" id="tickerPrice">$68,605</span>
+    <span class="ticker-change" id="tickerChange">--</span>
+  </div>
+  <div class="ticker-item">
+    <span class="ticker-label">24h Vol</span>
+    <span class="ticker-value" id="tickerVolume">--</span>
+  </div>
+  <div class="ticker-item">
+    <span class="ticker-label">Mkt Cap</span>
+    <span class="ticker-value" id="tickerMarketCap">--</span>
+  </div>
+  <div class="ticker-item">
+    <span class="ticker-label">Fear &amp; Greed</span>
+    <span class="ticker-value" id="tickerFearGreed">--</span>
+  </div>
+  <div class="ticker-item">
+    <span class="ticker-label">Dominance</span>
+    <span class="ticker-value" id="tickerDominance">--</span>
+  </div>
+</div>
+
+<!-- SNAPSHOT BANNER — frozen-in-time indicator -->
+<div class="snapshot-banner" id="snapshotBanner">
+  <strong>POINT-IN-TIME ANALYSIS</strong><span class="snapshot-sep">&middot;</span>All data, charts, and commentary reflect market conditions as of <span class="snapshot-date">February 16, 2026</span><span class="snapshot-sep">&middot;</span>Live ticker shows current prices for reference only
+</div>
+
 <!-- CHAPTER 01: THE STORY -->
 <div class="section-divider"></div>
 <div class="chapter-intro">
@@ -1525,18 +1749,18 @@ footer a:hover {
 <!-- 1. HERO -->
 <section class="hero" id="hero">
   <div class="hero-content">
-    <div class="hero-badge"><span class="pulse-dot"></span> Live Analysis | February 16, 2026</div>
+    <div class="hero-badge"><span class="pulse-dot"></span> Analysis Snapshot &middot; February 16, 2026</div>
     <h1>Bitcoin's <span class="highlight">-52.4%</span><br>Drawdown Decoded</h1>
     <p style="color:var(--text-secondary);font-size:1.15rem;max-width:660px;margin:0 auto;line-height:1.7">
       From an all-time high of $126,198 to a flash-crash low of $60,062. A full, data-driven breakdown of what happened, why it happened, and what comes next.
     </p>
     <div class="hero-stat-row">
-      <div class="hero-stat"><div class="value down" data-counter="60062" data-prefix="$">$0</div><div class="label">Feb 5 Flash Crash Low</div></div>
-      <div class="hero-stat"><div class="value neutral" data-counter="68605" data-prefix="$">$0</div><div class="label">Current Price (Feb 16)</div></div>
-      <div class="hero-stat"><div class="value down" data-counter="52" data-prefix="-" data-suffix=".4%">0</div><div class="label">Decline from ATH</div></div>
-      <div class="hero-stat"><div class="value down" data-counter="5" data-prefix="F&amp;G: ">0</div><div class="label">All-Time Low Sentiment</div></div>
+      <div class="hero-stat"><div class="value down" data-counter="60062" data-prefix="$">$60,062</div><div class="label">Feb 5 Flash Crash Low</div></div>
+      <div class="hero-stat"><div class="value neutral" id="heroCurrentPrice" data-counter="68605" data-prefix="$">$68,605</div><div class="label" id="heroCurrentLabel">Current Price (Feb 16)</div></div>
+      <div class="hero-stat"><div class="value down" data-counter="52" data-prefix="-" data-suffix=".4%">-52.4%</div><div class="label">Peak-to-Trough Decline</div></div>
+      <div class="hero-stat"><div class="value down" data-counter="5" data-prefix="F&amp;G: ">F&amp;G: 5</div><div class="label">All-Time Low Sentiment</div></div>
     </div>
-    <p class="hero-date">Analysis compiled February 16, 2026 &middot; 30+ sources cross-referenced &middot; 21 interactive charts &middot; On-chain data from Glassnode</p>
+    <p class="hero-date">All data frozen as of February 16, 2026 &middot; 30+ sources cross-referenced &middot; 21 interactive charts &middot; On-chain data from Glassnode</p>
   </div>
   <div class="scroll-indicator">
     Scroll to explore
@@ -1596,7 +1820,7 @@ footer a:hover {
       <div class="timeline-item"><div class="tl-date">Dec 10, 2025</div><div class="tl-title">Fed Signals Only 1 Cut in 2026</div><div class="tl-desc">Hawkish dot plot crushes rate-cut expectations. BTC consolidates at $80K to $88K. Markets had priced in 3-4 cuts.</div></div>
       <div class="timeline-item highlight"><div class="tl-date">Jan 30, 2026</div><div class="tl-title">Kevin Warsh Nominated as Fed Chair</div><div class="tl-desc">Known inflation hawk. BTC drops 17% in 72 hours. $1.7B in bullish bets liquidated. Gold -20%, silver -40%. Signals structurally tighter money ahead.</div></div>
       <div class="timeline-item"><div class="tl-date">Feb 1-2, 2026</div><div class="tl-title">Weekend Crash: $2.5B Liquidated</div><div class="tl-desc">Leverage cascade begins. BTC breaks below $80K for the first time since April 2025. 93% of liquidations are longs.</div></div>
-      <div class="timeline-item highlight"><div class="tl-date">Feb 5, 2026</div><div class="tl-title">Flash Crash to $60,062</div><div class="tl-desc">Worst single-day drop since FTX. $1.26B liquidated. Fear & Greed hits 5, an all-time low, worse than both Luna (6) and FTX (12).</div></div>
+      <div class="timeline-item highlight"><div class="tl-date">Feb 5, 2026</div><div class="tl-title">Flash Crash to $60,062</div><div class="tl-desc">Worst single-day drop since FTX. $1.68B liquidated. Fear & Greed drops to 8, then hits all-time low of 5 the next day (Feb 6), worse than both Luna (6) and FTX (12).</div></div>
       <div class="timeline-item"><div class="tl-date">Feb 6, 2026</div><div class="tl-title">Dead-Cat Bounce: +11% to $70K</div><div class="tl-desc">Whales buy 66,940 BTC in a single day, the largest single-day whale accumulation since 2022. Mega whale wallets add 70,000+ BTC.</div></div>
       <div class="timeline-item"><div class="tl-date">Feb 16, 2026</div><div class="tl-title">Current: $68,605</div><div class="tl-desc">Rangebound between $66K and $70K. Testing the 200-week EMA at $68K. Recovery on cooling inflation data. Outcome uncertain.</div></div>
     </div>
@@ -1860,7 +2084,7 @@ footer a:hover {
     <!-- Chart 3: Logarithmic Regression Bands -->
     <div class="chart-container reveal">
       <h3>Logarithmic Regression Bands</h3>
-      <div class="chart-subtitle">Benjamin Cowen's standard deviation bands. Current price ($69K) sits in the "Undervalued" zone at -0.5 SD.</div>
+      <div class="chart-subtitle">Benjamin Cowen's standard deviation bands. Current price ($68,605) sits in the "Undervalued" zone at -0.5 SD.</div>
       <div class="chart-canvas-wrap" style="height:480px"><canvas id="logRegressionChart"></canvas></div>
     </div>
 
@@ -1904,7 +2128,7 @@ footer a:hover {
       <p class="section-desc">What the blockchain data says about market positioning, sentiment, and historical cycle alignment.</p>
     </div>
     <div class="stat-grid reveal">
-      <div class="stat-card info"><div class="stat-value">1.32</div><div class="stat-label">MVRV Z-Score</div><div class="stat-detail">Fair value zone. Overheated >7, bottom &lt;0</div></div>
+      <div class="stat-card info"><div class="stat-value">0.47</div><div class="stat-label">MVRV Z-Score</div><div class="stat-detail">Approaching bottom zone. Overheated >7, bottom &lt;0</div></div>
       <div class="stat-card warn"><div class="stat-value">55%</div><div class="stat-label">Supply in Profit</div><div class="stat-detail">45% in loss, approaching convergence (bottom signal)</div></div>
       <div class="stat-card info"><div class="stat-value">Anxiety</div><div class="stat-label">NUPL Phase</div><div class="stat-detail">Fell from Euphoria (Oct) to Anxiety (Feb)</div></div>
       <div class="stat-card bull"><div class="stat-value">Active</div><div class="stat-label">Hash Ribbons Signal</div><div class="stat-detail">Capitulation signal, historically a bullish contrarian indicator</div></div>
@@ -1937,8 +2161,8 @@ footer a:hover {
     </div>
     <div class="stat-grid reveal">
       <div class="stat-card info"><div class="stat-value">~45</div><div class="stat-label">NVT Ratio</div><div class="stat-detail">Below 30 historically signals undervaluation</div></div>
-      <div class="stat-card bull"><div class="stat-value">2.4-2.8M</div><div class="stat-label">Exchange Reserves (BTC)</div><div class="stat-detail">Lowest since 2018, declining steadily per Glassnode data</div></div>
-      <div class="stat-card bull"><div class="stat-value">0.30</div><div class="stat-label">Risk Metric (Cowen)</div><div class="stat-detail">Buy zone below 0.3, sell zone above 0.7. At the threshold.</div></div>
+      <div class="stat-card bull"><div class="stat-value">1.72M</div><div class="stat-label">Exchange Reserves (BTC)</div><div class="stat-detail">Lowest since 2018, declining from 2.4M (Jan 2024) per Glassnode data</div></div>
+      <div class="stat-card bull"><div class="stat-value">0.28</div><div class="stat-label">Risk Metric (Cowen)</div><div class="stat-detail">Buy zone below 0.3, sell zone above 0.7. Currently in buy zone.</div></div>
     </div>
     <div class="chart-container reveal">
       <h3>NVT Ratio: Network Value to Transactions</h3>
@@ -2028,7 +2252,7 @@ footer a:hover {
           </tr>
           <tr style="background:rgba(16,185,129,0.08)">
             <td style="padding:10px 14px;border-radius:8px 0 0 8px;font-weight:600;color:var(--text-primary)">Fear &amp; Greed Index</td>
-            <td style="padding:10px 14px;font-family:var(--font-mono);font-size:0.82rem">8-10</td>
+            <td style="padding:10px 14px;font-family:var(--font-mono);font-size:0.82rem">12</td>
             <td style="padding:10px 14px;font-family:var(--font-mono);font-size:0.82rem;color:var(--text-secondary)">&lt; 10 (Extreme Fear)</td>
             <td style="padding:10px 14px;border-radius:0 8px 8px 0"><span style="background:rgba(16,185,129,0.2);color:var(--bullish);padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:600">TRIGGERED</span></td>
             <td style="padding:10px 14px;color:var(--text-secondary);font-size:0.82rem">F&amp;G &lt; 10 preceded 150 to 1,400% rallies every time</td>
@@ -2045,7 +2269,7 @@ footer a:hover {
             <td style="padding:10px 14px;font-family:var(--font-mono);font-size:0.82rem">~$58,000</td>
             <td style="padding:10px 14px;font-family:var(--font-mono);font-size:0.82rem;color:var(--text-secondary)">Price touches/pierces</td>
             <td style="padding:10px 14px;border-radius:0 8px 8px 0"><span style="background:rgba(245,158,11,0.2);color:var(--warning);padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:600">APPROACHING</span></td>
-            <td style="padding:10px 14px;color:var(--text-secondary);font-size:0.82rem">Price at $69K, still $11K above</td>
+            <td style="padding:10px 14px;color:var(--text-secondary);font-size:0.82rem">Price at $68,605, still ~$11K above</td>
           </tr>
           <tr style="background:rgba(245,158,11,0.08)">
             <td style="padding:10px 14px;border-radius:8px 0 0 8px;font-weight:600;color:var(--text-primary)">Puell Multiple</td>
@@ -2266,7 +2490,7 @@ footer a:hover {
           <tr><td>Leverage</td><td class="bear-col">Cascade risk persists</td><td class="bull-col">Massive deleveraging = healthier foundation.</td></tr>
           <tr><td>Sentiment</td><td class="bear-col">Fear justified</td><td class="bull-col">F&G at 5 preceded 150% to 1,400% rallies every time.</td></tr>
           <tr><td>Supply</td><td class="bear-col">Demand drying up</td><td class="bull-col">Supply drying up faster. Exchange reserves at 2018 lows.</td></tr>
-          <tr><td>Drawdown</td><td class="bear-col">Could reach -78%</td><td class="bull-col">Each cycle shallower: -86%, -84%, -78%, -52%.</td></tr>
+          <tr><td>Drawdown</td><td class="bear-col">Could reach -78%</td><td class="bull-col">Each cycle shallower: -86%, -84%, -77%, -52%.</td></tr>
         </tbody>
       </table>
     </div>
@@ -2300,7 +2524,7 @@ footer a:hover {
         <thead><tr><th>Risk Factor</th><th>Severity</th><th>Probability</th><th>Score</th><th>Status</th></tr></thead>
         <tbody>
           <tr><td>Nasdaq Correlation</td><td class="bear-col">8/10</td><td class="bear-col">7/10</td><td class="bear-col">56</td><td>BTC-Nasdaq correlation at 0.80</td></tr>
-          <tr><td>Leverage/Derivatives</td><td class="bear-col">8/10</td><td class="bear-col">7/10</td><td class="bear-col">56</td><td>$2.2B single-day liquidation event</td></tr>
+          <tr><td>Leverage/Derivatives</td><td class="bear-col">8/10</td><td class="bear-col">7/10</td><td class="bear-col">56</td><td>$2.5B weekend liquidation event (Feb 1-2)</td></tr>
           <tr><td>Quantum Computing</td><td class="bear-col">8/10</td><td style="color:var(--bullish)">1/10</td><td>8</td><td>Existential severity, decade+ away</td></tr>
           <tr><td>Stablecoin Systemic</td><td class="bear-col">7/10</td><td>4/10</td><td>28</td><td>S&P downgraded Tether "weak"</td></tr>
           <tr><td>Geopolitical</td><td class="bear-col">7/10</td><td>6/10</td><td>42</td><td>Tariff wars, trade disruption</td></tr>
@@ -2324,7 +2548,7 @@ footer a:hover {
     </div>
     <div class="verdict-box reveal">
       <h3>Correction, Not Collapse. But the Path Forward Is Narrow.</h3>
-      <p>The evidence points to a severe mid-cycle correction, not a structural bear market. The key difference: in 2018 and 2022, systemic failures destroyed infrastructure. In 2026, the plumbing is intact. ETFs still hold $113.8B. Corporate treasuries are growing. Regulatory clarity is the best it has ever been.</p>
+      <p>The evidence points to a severe mid-cycle correction, not a structural bear market. The key difference: in 2018 and 2022, systemic failures destroyed infrastructure. In 2026, the plumbing is intact. ETFs still hold $123B+. Corporate treasuries are growing. Regulatory clarity is the best it has ever been.</p>
       <p>But the macro headwinds are real. The Warsh nomination, persistent above-target inflation, tariff escalation, and dollar strength all work against zero-yield risk assets. Gold's +24% divergence from BTC's -52% is the clearest sign that institutional capital still does not treat Bitcoin as a safe haven.</p>
       <p>It comes down to monetary policy. If the Fed delivers rate cuts in H2 2026 and the dollar softens, tight supply plus institutional infrastructure set up a strong recovery. If inflation re-accelerates and Warsh pushes tighter policy, the floor could be lower than $60K.</p>
       <p style="font-weight:600;color:var(--text-primary)">The $60,000 to $65,000 zone is the critical structural floor. Below it, the 2021 cycle high of $69K is broken and the picture shifts from "correction" to "bear market." Above $72K, recovery scenarios remain viable.</p>
@@ -2703,7 +2927,7 @@ createChartOnReveal('fearGreedChart', function(ctx) {
 // ============================================================
 createChartOnReveal('etfChart', function(ctx) {
   var L = ['Jan 25', 'Feb 25', 'Mar 25', 'Apr 25', 'May 25', 'Jun 25', 'Jul 25', 'Aug 25', 'Sep 25', 'Oct 25', 'Nov 25', 'Dec 25', 'Jan 26', 'Feb 26*'];
-  var D = [4.5, 3.8, 2.5, 1.8, 2.2, 3.5, 4.2, 3.0, 2.8, 2.0, -3.48, -1.09, -3.0, -0.5];
+  var D = [4.5, 3.8, 2.5, 1.8, 2.2, 3.5, 4.2, 3.0, 2.8, 2.0, -3.48, -0.9, -1.8, -0.5];
   var colors = D.map(function(v) {
     return v >= 0 ? 'rgba(16,185,129,0.65)' : 'rgba(239,68,68,0.7)';
   });
@@ -3298,7 +3522,7 @@ createChartOnReveal('halvingChart', function(ctx) {
 // ============================================================
 createChartOnReveal('drawdownChart', function(ctx) {
   var L = ['2014-2015', '2017-2018', '2021-2022', '2025-2026'];
-  var D = [-85, -84, -78, -52];
+  var D = [-86, -84, -77, -52];
   var C = ['rgba(239,68,68,0.85)', 'rgba(239,68,68,0.7)', 'rgba(239,68,68,0.55)', 'rgba(247,147,26,0.7)'];
 
   new Chart(ctx, {
@@ -3435,7 +3659,7 @@ createChartOnReveal('diminishingDrawdownChart', function(ctx) {
             },
             currentLabel: {
               type: 'label', xValue: 4, yValue: -52,
-              content: ['Current: -52%', 'Price: $60,062'],
+              content: ['Max Drawdown: -52%', 'Low: $60,062'],
               backgroundColor: 'rgba(59,130,246,0.15)', color: '#3b82f6',
               font: { family: "'JetBrains Mono'", size: 10, weight: '600' },
               padding: { top: 4, bottom: 4, left: 8, right: 8 }, borderRadius: 4, yAdjust: -30
@@ -3480,8 +3704,8 @@ createChartOnReveal('drawdownTrajectoryChart', function(ctx) {
   var c2 = [0, -18, -30, -40, -55, -71, -65, -62, -60, -58, -55, -57, -60, -65, -70, -75, -80, -85, -84];
   var c3 = [0, -10, -22, -35, -55, -70, -60, -65, -63, -65, -67, -68, -70, -75, -80, -84, -83, -82, null];
   var c4 = [0, -7, -12, -18, -28, -51, -45, -48, -50, -52, -55, -57, -60, -65, -70, -75, -77, -76, null];
-  var c5 = [0, -5, -8, -15, -24, -32, -41, -45, null, null, null, null, null, null, null, null, null, null, null];
-  var c5proj = [null, null, null, null, null, null, null, -45, -48, -52, -55, -58, -62, -65, -68, -70, -70, -68, null];
+  var c5 = [0, -5, -8, -15, -24, -32, -41, -52, null, null, null, null, null, null, null, null, null, null, null];
+  var c5proj = [null, null, null, null, null, null, null, -52, -55, -58, -60, -62, -65, -67, -68, -70, -70, -68, null];
 
   function dsLine(label, color, data, width, dash) {
     return {
@@ -3528,11 +3752,11 @@ createChartOnReveal('drawdownTrajectoryChart', function(ctx) {
         annotation: {
           annotations: {
             youAreHere: {
-              type: 'point', xValue: 133, yValue: -45,
+              type: 'point', xValue: 133, yValue: -52,
               backgroundColor: CC.cyan, borderColor: '#fff', borderWidth: 2, radius: 7
             },
             hereLabel: {
-              type: 'label', xValue: 133, yValue: -45,
+              type: 'label', xValue: 133, yValue: -52,
               content: ['YOU ARE HERE', 'Day 133, -52%'],
               backgroundColor: 'rgba(6,182,212,0.15)', color: CC.cyan,
               font: { family: "'JetBrains Mono'", size: 10, weight: '600' },
@@ -3597,12 +3821,15 @@ createChartOnReveal('logRegressionChart', function(ctx) {
   var bandPlus1 = [1500, 3500, 9000, 16000, 28000, 50000, 90000, 135000, 150000, 150000, 165000, 200000, 250000];
   var bandPlus1_5 = [2200, 5500, 15000, 26000, 45000, 80000, 140000, 190000, 200000, 200000, 210000, 250000, 310000];
   var bandPlus2 = [3500, 9000, 25000, 42000, 72000, 128000, 220000, 280000, 280000, 270000, 270000, 310000, 390000];
-  var btcPrice = [315, 650, 19783, 3200, 7200, 8821, 69044, 15476, 42000, 64969, 126198, 69000, null];
+  var btcPrice = [315, 650, 19783, 3200, 7200, 8821, 69044, 15476, 42000, 64969, 126198, 68605, null];
 
-  function bandDef(label, top, bot, color) {
+  // Use absolute fill targets to avoid issues with Chart.js draw order reordering
+  // Boosted alpha values (2.5x) for visibility against ultra-dark #050508 background
+  function bandDef(label, data, fillTarget, fillColor, borderClr) {
     return {
-      label: label, data: top, fill: '+1', backgroundColor: color,
-      borderColor: 'transparent', borderWidth: 0, pointRadius: 0, tension: 0.4, order: 10
+      label: label, data: data, fill: { target: fillTarget, above: fillColor, below: fillColor },
+      backgroundColor: fillColor,
+      borderColor: borderClr, borderWidth: 0.5, pointRadius: 0, tension: 0.4
     };
   }
 
@@ -3611,33 +3838,34 @@ createChartOnReveal('logRegressionChart', function(ctx) {
     data: {
       labels: labels,
       datasets: [
-        bandDef('+2 SD "SELL!"', bandPlus2, bandPlus1_5, 'rgba(239,68,68,0.18)'),
-        bandDef('+1.5 SD "Bubble?"', bandPlus1_5, bandPlus1, 'rgba(239,68,68,0.13)'),
-        bandDef('+1 SD "Caution"', bandPlus1, bandPlus05, 'rgba(249,115,22,0.14)'),
-        bandDef('+0.5 SD "HODL"', bandPlus05, fairValue, 'rgba(245,158,11,0.14)'),
-        bandDef('Fair Value', fairValue, bandMinus05, 'rgba(139,92,246,0.14)'),
-        bandDef('-0.5 SD "Undervalued"', bandMinus05, bandMinus1, 'rgba(16,185,129,0.14)'),
-        bandDef('-1 SD "Still Cheap"', bandMinus1, bandMinus1_5, 'rgba(59,130,246,0.14)'),
-        bandDef('-1.5 SD "Accumulate"', bandMinus1_5, bandMinus2, 'rgba(59,130,246,0.10)'),
+        bandDef('+2 SD "SELL!"', bandPlus2, 1, 'rgba(239,68,68,0.40)', 'rgba(239,68,68,0.35)'),
+        bandDef('+1.5 SD "Bubble?"', bandPlus1_5, 2, 'rgba(239,68,68,0.30)', 'rgba(239,68,68,0.25)'),
+        bandDef('+1 SD "Caution"', bandPlus1, 3, 'rgba(249,115,22,0.32)', 'rgba(249,115,22,0.25)'),
+        bandDef('+0.5 SD "HODL"', bandPlus05, 4, 'rgba(245,158,11,0.32)', 'rgba(245,158,11,0.25)'),
+        bandDef('Fair Value', fairValue, 5, 'rgba(139,92,246,0.32)', 'rgba(139,92,246,0.25)'),
+        bandDef('-0.5 SD "Undervalued"', bandMinus05, 6, 'rgba(16,185,129,0.32)', 'rgba(16,185,129,0.25)'),
+        bandDef('-1 SD "Still Cheap"', bandMinus1, 7, 'rgba(59,130,246,0.32)', 'rgba(59,130,246,0.25)'),
+        bandDef('-1.5 SD "Accumulate"', bandMinus1_5, 8, 'rgba(59,130,246,0.25)', 'rgba(59,130,246,0.20)'),
         {
           label: '-2 SD "Fire Sale"', data: bandMinus2, fill: 'origin',
-          backgroundColor: 'rgba(30,58,138,0.10)', borderColor: 'transparent',
-          borderWidth: 0, pointRadius: 0, tension: 0.4, order: 10
+          backgroundColor: 'rgba(30,58,138,0.22)', borderColor: 'rgba(30,58,138,0.20)',
+          borderWidth: 0.5, pointRadius: 0, tension: 0.4
         },
         {
           label: 'BTC Price', data: btcPrice, borderColor: '#eaeaf0', backgroundColor: 'transparent',
-          borderWidth: 2.5,
-          pointRadius: function(c) { return c.dataIndex === 10 ? 7 : c.dataIndex === 11 ? 6 : 3; },
-          pointBackgroundColor: function(c) {
-            return c.dataIndex === 10 ? CC.bullish : c.dataIndex === 11 ? CC.cyan : '#eaeaf0';
-          },
-          pointBorderColor: 'transparent', tension: 0.3, order: 1, spanGaps: false
+          borderWidth: 2.5, fill: false,
+          pointRadius: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 0],
+          pointBackgroundColor: ['#eaeaf0','#eaeaf0','#eaeaf0','#eaeaf0','#eaeaf0','#eaeaf0','#eaeaf0','#eaeaf0','#eaeaf0','#eaeaf0',CC.bullish,CC.cyan,'transparent'],
+          pointBorderColor: 'transparent', tension: 0.3, spanGaps: false
         }
       ]
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       interaction: { intersect: false, mode: 'index' },
       plugins: {
+        filler: { propagate: false },
         legend: { display: false },
         tooltip: Object.assign({}, TT, {
           callbacks: {
@@ -3653,8 +3881,8 @@ createChartOnReveal('logRegressionChart', function(ctx) {
         annotation: {
           annotations: {
             currentLabel: {
-              type: 'label', xValue: 11, yValue: 69000,
-              content: ['Current: $69K', '"-0.5 SD Undervalued"'],
+              type: 'label', xValue: 11, yValue: 68605,
+              content: ['Current: $68,605', '"-0.5 SD Undervalued"'],
               backgroundColor: 'rgba(6,182,212,0.12)', color: CC.cyan,
               font: { family: "'JetBrains Mono'", size: 10, weight: '600' },
               padding: { top: 5, bottom: 5, left: 10, right: 10 }, borderRadius: 6, xAdjust: 95
@@ -3831,7 +4059,7 @@ createChartOnReveal('supplyChart', function(ctx) {
 createChartOnReveal('fairValueChart', function(ctx) {
   var models = ['Power Law\n(Santostasi)', 'Stock-to-Flow\n(PlanB)', 'Rainbow Chart\n(Log Regression)', 'Thermocap\nMultiple', 'Realized Price\n(LTH Cost Basis)'];
   var fairValues = [129000, 375000, 84400, 252000, 40510];
-  var currentPrice = 68700;
+  var currentPrice = 68605;
   var deviations = fairValues.map(function(fv) { return Math.round((currentPrice - fv) / fv * 100); });
   var barColors = fairValues.map(function(fv) {
     return currentPrice < fv ? 'rgba(16,185,129,0.65)' : 'rgba(245,158,11,0.65)';
@@ -3860,17 +4088,17 @@ createChartOnReveal('fairValueChart', function(ctx) {
             label: function(c) { return 'Fair Value: $' + c.parsed.x.toLocaleString(); },
             afterLabel: function(c) {
               var dev = deviations[c.dataIndex];
-              return 'Current $68,700 (' + (dev >= 0 ? '+' : '') + dev + '%)';
+              return 'Current $68,605 (' + (dev >= 0 ? '+' : '') + dev + '%)';
             }
           }
         }),
         annotation: {
           annotations: {
             currentLine: {
-              type: 'line', xMin: 68700, xMax: 68700,
+              type: 'line', xMin: 68605, xMax: 68605,
               borderColor: CC.bearish, borderWidth: 2, borderDash: [6, 4],
               label: {
-                display: true, content: 'Current $68,700', position: 'start',
+                display: true, content: 'Current $68,605', position: 'start',
                 backgroundColor: 'rgba(239,68,68,0.15)', color: CC.bearish,
                 font: { family: "'JetBrains Mono'", size: 10, weight: '600' },
                 padding: { top: 3, bottom: 3, left: 6, right: 6 }
@@ -4562,6 +4790,7 @@ var revealObserver = new IntersectionObserver(function(entries) {
   entries.forEach(function(entry) {
     if (entry.isIntersecting) {
       entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
     }
   });
 }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
@@ -4574,23 +4803,28 @@ document.querySelectorAll('.reveal').forEach(function(el) {
 // ============================================================
 // SCROLL PROGRESS BAR & NAV ACTIVE STATE
 // ============================================================
+// Cache DOM queries for scroll performance (called on every scroll event)
+var _scrollProgress = document.getElementById('scrollProgress');
+var _navEl = document.getElementById('nav');
+var _sections = document.querySelectorAll('section[id]');
+var _navLinksAll = document.querySelectorAll('.nav-links a');
+
 function onScroll() {
   var s = window.scrollY;
   var d = document.documentElement.scrollHeight - window.innerHeight;
   var progress = d > 0 ? (s / d) * 100 : 0;
-  document.getElementById('scrollProgress').style.width = progress + '%';
+  _scrollProgress.style.width = progress + '%';
 
-  var nav = document.getElementById('nav');
-  if (s > 50) nav.classList.add('scrolled');
-  else nav.classList.remove('scrolled');
+  if (s > 50) _navEl.classList.add('scrolled');
+  else _navEl.classList.remove('scrolled');
 
   var pos = s + 120;
-  document.querySelectorAll('section[id]').forEach(function(sec) {
+  _sections.forEach(function(sec) {
     var t = sec.offsetTop;
     var h = sec.offsetHeight;
     var id = sec.getAttribute('id');
     if (pos >= t && pos < t + h) {
-      document.querySelectorAll('.nav-links a').forEach(function(a) {
+      _navLinksAll.forEach(function(a) {
         a.classList.remove('active');
         if (a.getAttribute('href') === '#' + id) a.classList.add('active');
       });
@@ -4650,6 +4884,338 @@ document.querySelectorAll('.nav-links a').forEach(function(a) {
     document.querySelector('.nav-links').classList.remove('open');
   });
 });
+
+
+// ============================================================
+// LIVE DATA API SYSTEM
+// ============================================================
+(function() {
+  'use strict';
+
+  // --- Configuration ---
+  var REFRESH_INTERVAL = 60000; // 60 seconds
+  var STALE_THRESHOLD = 300000; // 5 minutes = stale
+  var lastUpdate = null;
+  var refreshTimer = null;
+
+  // --- Fallback static data ---
+  var STATIC_DATA = {
+    price: 68605,
+    change24h: -2.3,
+    marketCap: 1360000000000,
+    volume24h: 42500000000,
+    fearGreed: 12,
+    fearGreedText: 'Extreme Fear',
+    dominance: 61.2,
+    hashRate: 785,
+    blockHeight: 0,
+    mempoolSize: 0
+  };
+
+  // --- DOM references ---
+  var els = {
+    ticker: document.getElementById('liveTicker'),
+    dot: document.getElementById('tickerDot'),
+    status: document.getElementById('tickerStatus'),
+    price: document.getElementById('tickerPrice'),
+    change: document.getElementById('tickerChange'),
+    volume: document.getElementById('tickerVolume'),
+    marketCap: document.getElementById('tickerMarketCap'),
+    fearGreed: document.getElementById('tickerFearGreed'),
+    dominance: document.getElementById('tickerDominance'),
+    heroBadge: null // Hero badge shows static snapshot date — not modified by live data
+  };
+
+  // --- Utility formatters ---
+  function fmtUSD(n) {
+    if (n >= 1e12) return '$' + (n / 1e12).toFixed(2) + 'T';
+    if (n >= 1e9) return '$' + (n / 1e9).toFixed(1) + 'B';
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+    return '$' + n.toLocaleString();
+  }
+
+  function fmtPrice(n) {
+    return '$' + Math.round(n).toLocaleString();
+  }
+
+  function fmtPct(n) {
+    var sign = n >= 0 ? '+' : '';
+    return sign + n.toFixed(1) + '%';
+  }
+
+  function fmtTime(d) {
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // --- Status management ---
+  function setStatus(state, text) {
+    if (els.dot) {
+      els.dot.className = 'ticker-dot ' + state;
+    }
+    if (els.status) {
+      els.status.textContent = text;
+    }
+    if (els.ticker) {
+      els.ticker.classList.toggle('loading', state === 'offline');
+    }
+  }
+
+  // --- Update the ticker UI ---
+  function updateTicker(data) {
+    if (els.price) {
+      els.price.textContent = fmtPrice(data.price);
+      els.price.className = 'ticker-value ' + (data.change24h >= 0 ? 'up' : 'down');
+    }
+
+    if (els.change) {
+      els.change.textContent = fmtPct(data.change24h);
+      els.change.className = 'ticker-change ' + (data.change24h >= 0 ? 'up' : 'down');
+    }
+
+    if (els.volume) {
+      els.volume.textContent = fmtUSD(data.volume24h);
+    }
+
+    if (els.marketCap) {
+      els.marketCap.textContent = fmtUSD(data.marketCap);
+    }
+
+    if (els.fearGreed) {
+      var fg = data.fearGreed;
+      var fgClass = fg <= 25 ? 'extreme-fear' : fg <= 45 ? 'fear' : fg <= 55 ? 'neutral' : 'greed';
+      els.fearGreed.textContent = fg + ' · ' + data.fearGreedText;
+      els.fearGreed.className = 'ticker-value ' + fgClass;
+    }
+
+    if (els.dominance) {
+      els.dominance.textContent = data.dominance.toFixed(1) + '%';
+    }
+
+    // Hero badge always shows the analysis snapshot date — do NOT overwrite
+    // Live data is shown in the ticker bar, not in the hero badge
+
+    lastUpdate = Date.now();
+    setStatus('live', 'Live · ' + fmtTime(new Date()));
+  }
+
+  // --- localStorage cache helpers ---
+  function cacheSet(key, data) {
+    try { localStorage.setItem('btc_' + key, JSON.stringify({ data: data, ts: Date.now() })); }
+    catch(e) { /* quota exceeded or private browsing */ }
+  }
+
+  function cacheGet(key, maxAgeMs) {
+    try {
+      var raw = localStorage.getItem('btc_' + key);
+      if (!raw) return null;
+      var obj = JSON.parse(raw);
+      if (Date.now() - obj.ts > maxAgeMs) return null;
+      return obj.data;
+    } catch(e) { return null; }
+  }
+
+  // --- Fetch BTC price from Blockchain.info (confirmed CORS via ?cors=true) ---
+  function fetchPrice() {
+    var cached = cacheGet('price', 30000); // 30s cache
+    if (cached) return Promise.resolve(cached);
+
+    return fetch('https://blockchain.info/ticker?cors=true')
+      .then(function(r) {
+        if (!r.ok) throw new Error('Blockchain.info HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(d) {
+        var result = {
+          price: d.USD ? d.USD.last : STATIC_DATA.price
+        };
+        cacheSet('price', result);
+        return result;
+      })
+      .catch(function() {
+        // Fallback to CoinGecko
+        return fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true')
+          .then(function(r) { return r.json(); })
+          .then(function(d) {
+            var btc = d.bitcoin;
+            return {
+              price: btc.usd || STATIC_DATA.price,
+              change24h: btc.usd_24h_change || STATIC_DATA.change24h,
+              marketCap: btc.usd_market_cap || STATIC_DATA.marketCap,
+              volume24h: btc.usd_24h_vol || STATIC_DATA.volume24h
+            };
+          });
+      });
+  }
+
+  // --- Fetch network stats from Blockchain.info (CORS confirmed) ---
+  function fetchNetworkStats() {
+    var cached = cacheGet('stats', 120000); // 2min cache
+    if (cached) return Promise.resolve(cached);
+
+    return fetch('https://api.blockchain.info/stats?cors=true')
+      .then(function(r) {
+        if (!r.ok) throw new Error('Stats HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(d) {
+        var supply = d.totalbc ? d.totalbc / 1e8 : 19800000;
+        var result = {
+          marketCap: d.market_price_usd ? d.market_price_usd * supply : STATIC_DATA.marketCap,
+          volume24h: d.trade_volume_usd || STATIC_DATA.volume24h,
+          hashRate: d.hash_rate ? Math.round(d.hash_rate / 1e9) : STATIC_DATA.hashRate
+        };
+        cacheSet('stats', result);
+        return result;
+      });
+  }
+
+  // --- Fetch Fear & Greed Index from Alternative.me (CORS confirmed) ---
+  function fetchFearGreed() {
+    var cached = cacheGet('fng', 1800000); // 30min cache (updates daily)
+    if (cached) return Promise.resolve(cached);
+
+    return fetch('https://api.alternative.me/fng/?limit=1')
+      .then(function(r) {
+        if (!r.ok) throw new Error('F&G HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(d) {
+        var entry = d.data && d.data[0];
+        var result = {
+          fearGreed: entry ? parseInt(entry.value) : STATIC_DATA.fearGreed,
+          fearGreedText: entry ? entry.value_classification : STATIC_DATA.fearGreedText
+        };
+        cacheSet('fng', result);
+        return result;
+      });
+  }
+
+  // --- Fetch mining data from Mempool.space (CORS confirmed) ---
+  function fetchMempool() {
+    var cached = cacheGet('mempool', 600000); // 10min cache
+    if (cached) return Promise.resolve(cached);
+
+    return fetch('https://mempool.space/api/v1/mining/hashrate/1m')
+      .then(function(r) {
+        if (!r.ok) throw new Error('Mempool HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(d) {
+        var result = {
+          hashRate: d.currentHashrate ? Math.round(d.currentHashrate / 1e18) : STATIC_DATA.hashRate
+        };
+        cacheSet('mempool', result);
+        return result;
+      });
+  }
+
+  // --- Fetch BTC dominance from CoinGecko (CORS unreliable - best effort) ---
+  function fetchDominance() {
+    var cached = cacheGet('dominance', 300000); // 5min cache
+    if (cached) return Promise.resolve(cached);
+
+    return fetch('https://api.coingecko.com/api/v3/global')
+      .then(function(r) {
+        if (!r.ok) throw new Error('Global HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(d) {
+        var result = {
+          dominance: d.data && d.data.market_cap_percentage && d.data.market_cap_percentage.btc
+            ? d.data.market_cap_percentage.btc
+            : STATIC_DATA.dominance
+        };
+        cacheSet('dominance', result);
+        return result;
+      });
+  }
+
+  // --- Master fetch: runs all APIs in parallel, merges results ---
+  function fetchAllData() {
+    setStatus('live', 'Updating...');
+
+    var results = { ok: 0, fail: 0 };
+    var merged = Object.assign({}, STATIC_DATA);
+
+    var promises = [
+      fetchPrice().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; }),
+      fetchNetworkStats().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; }),
+      fetchFearGreed().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; }),
+      fetchMempool().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; }),
+      fetchDominance().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; })
+    ];
+
+    return Promise.all(promises).then(function() {
+      updateTicker(merged);
+
+      if (results.fail > 0 && results.ok > 0) {
+        setStatus('stale', 'Partial · ' + fmtTime(new Date()));
+      } else if (results.fail === promises.length) {
+        setStatus('offline', 'Offline · Using cached data');
+        updateTicker(STATIC_DATA);
+      }
+
+      return merged;
+    });
+  }
+
+  // --- Stale checker ---
+  function checkStale() {
+    if (lastUpdate && (Date.now() - lastUpdate) > STALE_THRESHOLD) {
+      setStatus('stale', 'Stale · Last update ' + fmtTime(new Date(lastUpdate)));
+    }
+  }
+
+  // --- Initialize ---
+  function init() {
+    // Show static data immediately
+    updateTicker(STATIC_DATA);
+    setStatus('live', 'Loading live data...');
+
+    // Fetch live data
+    fetchAllData().catch(function(err) {
+      console.warn('[LiveData] Init fetch failed:', err);
+      setStatus('offline', 'Offline · Static data');
+    });
+
+    // Set up auto-refresh
+    refreshTimer = setInterval(function() {
+      fetchAllData().catch(function(err) {
+        console.warn('[LiveData] Refresh failed:', err);
+        checkStale();
+      });
+    }, REFRESH_INTERVAL);
+
+    // Check for stale data every 30s
+    var staleTimer = setInterval(checkStale, 30000);
+
+    // Pause refresh when tab is hidden, resume when visible
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        clearInterval(refreshTimer);
+        clearInterval(staleTimer);
+      } else {
+        clearInterval(refreshTimer); // Prevent duplicate intervals on rapid tab switching
+        clearInterval(staleTimer);
+        fetchAllData().catch(function() {});
+        refreshTimer = setInterval(function() {
+          fetchAllData().catch(function() { checkStale(); });
+        }, REFRESH_INTERVAL);
+        staleTimer = setInterval(checkStale, 30000);
+      }
+    });
+  }
+
+  // Wait for DOM, then start
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // Expose for manual refresh
+  window.refreshLiveData = fetchAllData;
+})();
 </script>
 </body>
 </html>
