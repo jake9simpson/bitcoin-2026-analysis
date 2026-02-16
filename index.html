@@ -555,6 +555,23 @@ section:first-of-type {
   padding-top: 120px;
 }
 
+.chapter-number {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  margin-bottom: 12px;
+}
+
+.chapter-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
 .chapter-intro h2 {
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3vw, 2rem);
@@ -5129,14 +5146,15 @@ document.querySelectorAll('.nav-links a').forEach(function(a) {
       });
     }, REFRESH_INTERVAL);
 
-    // Check for stale data every 30s
-    setInterval(checkStale, 30000);
+    // Check for stale data every 30s (stored for cleanup)
+    var staleTimer = setInterval(checkStale, 30000);
 
     // Pause refresh when tab is hidden, resume when visible
     document.addEventListener('visibilitychange', function() {
       if (document.hidden) {
         clearInterval(refreshTimer);
       } else {
+        clearInterval(refreshTimer); // Prevent duplicate intervals on rapid tab switching
         fetchAllData().catch(function() {});
         refreshTimer = setInterval(function() {
           fetchAllData().catch(function() { checkStale(); });
