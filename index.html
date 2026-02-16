@@ -4941,26 +4941,82 @@ document.querySelectorAll('.nav-links a').forEach(function(a) {
     setStatus('live', 'Live · ' + fmtTime(new Date()));
   }
 
-  // --- Fetch Bitcoin price data from CoinGecko ---
-  function fetchCoinGecko() {
-    return fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true')
+  // --- localStorage cache helpers ---
+  function cacheSet(key, data) {
+    try { localStorage.setItem('btc_' + key, JSON.stringify({ data: data, ts: Date.now() })); }
+    catch(e) { /* quota exceeded or private browsing */ }
+  }
+
+  function cacheGet(key, maxAgeMs) {
+    try {
+      var raw = localStorage.getItem('btc_' + key);
+      if (!raw) return null;
+      var obj = JSON.parse(raw);
+      if (Date.now() - obj.ts > maxAgeMs) return null;
+      return obj.data;
+    } catch(e) { return null; }
+  }
+
+  // --- Fetch BTC price from Blockchain.info (confirmed CORS via ?cors=true) ---
+  function fetchPrice() {
+    var cached = cacheGet('price', 30000); // 30s cache
+    if (cached) return Promise.resolve(cached);
+
+    return fetch('https://blockchain.info/ticker?cors=true')
       .then(function(r) {
-        if (!r.ok) throw new Error('CoinGecko HTTP ' + r.status);
+        if (!r.ok) throw new Error('Blockchain.info HTTP ' + r.status);
         return r.json();
       })
       .then(function(d) {
-        var btc = d.bitcoin;
-        return {
-          price: btc.usd || STATIC_DATA.price,
-          change24h: btc.usd_24h_change || STATIC_DATA.change24h,
-          marketCap: btc.usd_market_cap || STATIC_DATA.marketCap,
-          volume24h: btc.usd_24h_vol || STATIC_DATA.volume24h
+        var result = {
+          price: d.USD ? d.USD.last : STATIC_DATA.price
         };
+        cacheSet('price', result);
+        return result;
+      })
+      .catch(function() {
+        // Fallback to CoinGecko
+        return fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true')
+          .then(function(r) { return r.json(); })
+          .then(function(d) {
+            var btc = d.bitcoin;
+            return {
+              price: btc.usd || STATIC_DATA.price,
+              change24h: btc.usd_24h_change || STATIC_DATA.change24h,
+              marketCap: btc.usd_market_cap || STATIC_DATA.marketCap,
+              volume24h: btc.usd_24h_vol || STATIC_DATA.volume24h
+            };
+          });
       });
   }
 
-  // --- Fetch Fear & Greed Index ---
+  // --- Fetch network stats from Blockchain.info (CORS confirmed) ---
+  function fetchNetworkStats() {
+    var cached = cacheGet('stats', 120000); // 2min cache
+    if (cached) return Promise.resolve(cached);
+
+    return fetch('https://api.blockchain.info/stats?cors=true')
+      .then(function(r) {
+        if (!r.ok) throw new Error('Stats HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(d) {
+        var supply = d.totalbc ? d.totalbc / 1e8 : 19800000;
+        var result = {
+          marketCap: d.market_price_usd ? d.market_price_usd * supply : STATIC_DATA.marketCap,
+          volume24h: d.trade_volume_usd || STATIC_DATA.volume24h,
+          hashRate: d.hash_rate ? Math.round(d.hash_rate / 1e9) : STATIC_DATA.hashRate
+        };
+        cacheSet('stats', result);
+        return result;
+      });
+  }
+
+  // --- Fetch Fear & Greed Index from Alternative.me (CORS confirmed) ---
   function fetchFearGreed() {
+    var cached = cacheGet('fng', 1800000); // 30min cache (updates daily)
+    if (cached) return Promise.resolve(cached);
+
     return fetch('https://api.alternative.me/fng/?limit=1')
       .then(function(r) {
         if (!r.ok) throw new Error('F&G HTTP ' + r.status);
@@ -4968,43 +5024,52 @@ document.querySelectorAll('.nav-links a').forEach(function(a) {
       })
       .then(function(d) {
         var entry = d.data && d.data[0];
-        return {
+        var result = {
           fearGreed: entry ? parseInt(entry.value) : STATIC_DATA.fearGreed,
           fearGreedText: entry ? entry.value_classification : STATIC_DATA.fearGreedText
         };
+        cacheSet('fng', result);
+        return result;
       });
   }
 
-  // --- Fetch BTC dominance from CoinGecko global ---
-  function fetchGlobal() {
-    return fetch('https://api.coingecko.com/api/v3/global')
-      .then(function(r) {
-        if (!r.ok) throw new Error('Global HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function(d) {
-        return {
-          dominance: d.data && d.data.market_cap_percentage && d.data.market_cap_percentage.btc
-            ? d.data.market_cap_percentage.btc
-            : STATIC_DATA.dominance
-        };
-      });
-  }
-
-  // --- Fetch mining/mempool data from mempool.space ---
+  // --- Fetch mining data from Mempool.space (CORS confirmed) ---
   function fetchMempool() {
+    var cached = cacheGet('mempool', 600000); // 10min cache
+    if (cached) return Promise.resolve(cached);
+
     return fetch('https://mempool.space/api/v1/mining/hashrate/1m')
       .then(function(r) {
         if (!r.ok) throw new Error('Mempool HTTP ' + r.status);
         return r.json();
       })
       .then(function(d) {
-        var latest = d.hashrates && d.hashrates.length > 0
-          ? d.hashrates[d.hashrates.length - 1]
-          : null;
-        return {
-          hashRate: latest ? Math.round(latest.avgHashrate / 1e18) : STATIC_DATA.hashRate
+        var result = {
+          hashRate: d.currentHashrate ? Math.round(d.currentHashrate / 1e18) : STATIC_DATA.hashRate
         };
+        cacheSet('mempool', result);
+        return result;
+      });
+  }
+
+  // --- Fetch BTC dominance from CoinGecko (CORS unreliable - best effort) ---
+  function fetchDominance() {
+    var cached = cacheGet('dominance', 300000); // 5min cache
+    if (cached) return Promise.resolve(cached);
+
+    return fetch('https://api.coingecko.com/api/v3/global')
+      .then(function(r) {
+        if (!r.ok) throw new Error('Global HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(d) {
+        var result = {
+          dominance: d.data && d.data.market_cap_percentage && d.data.market_cap_percentage.btc
+            ? d.data.market_cap_percentage.btc
+            : STATIC_DATA.dominance
+        };
+        cacheSet('dominance', result);
+        return result;
       });
   }
 
@@ -5012,15 +5077,15 @@ document.querySelectorAll('.nav-links a').forEach(function(a) {
   function fetchAllData() {
     setStatus('live', 'Updating...');
 
-    // Use Promise.allSettled pattern (manual for ES5 compatibility)
     var results = { ok: 0, fail: 0 };
     var merged = Object.assign({}, STATIC_DATA);
 
     var promises = [
-      fetchCoinGecko().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; }),
+      fetchPrice().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; }),
+      fetchNetworkStats().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; }),
       fetchFearGreed().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; }),
-      fetchGlobal().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; }),
-      fetchMempool().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; })
+      fetchMempool().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; }),
+      fetchDominance().then(function(d) { Object.assign(merged, d); results.ok++; }).catch(function() { results.fail++; })
     ];
 
     return Promise.all(promises).then(function() {
