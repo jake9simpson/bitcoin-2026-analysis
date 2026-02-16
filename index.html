@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050508">
 <title>Bitcoin 2026: Anatomy of a 52% Decline | Premium Analysis</title>
 <meta name="description" content="Data-driven analysis of Bitcoin's 52% drawdown from $126,198 to $60,062. Interactive charts, on-chain metrics, insider quotes, and risk assessment.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -555,7 +556,7 @@ section {
 }
 
 section:first-of-type {
-  scroll-margin-top: 0;
+  scroll-margin-top: 130px;
 }
 
 .container {
@@ -1647,7 +1648,7 @@ footer a:hover {
       </svg>
       BTC<span>2026</span>
     </div>
-    <button class="nav-mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">
+    <button class="nav-mobile-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks" onclick="var n=document.querySelector('.nav-links');n.classList.toggle('open');this.setAttribute('aria-expanded',n.classList.contains('open'))">
       <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
     </button>
     <div class="nav-links" id="navLinks">
@@ -1679,6 +1680,7 @@ footer a:hover {
           <a href="#halving">Halving Analysis</a>
           <a href="#drawdowns">Drawdowns</a>
           <a href="#onchain">On-Chain</a>
+          <a href="#network-health">Network Health</a>
           <a href="#bottoming">Bottoming Signals</a>
         </div>
       </div>
@@ -1753,10 +1755,10 @@ footer a:hover {
       From an all-time high of $126,198 to a flash-crash low of $60,062. A full, data-driven breakdown of what happened, why it happened, and what comes next.
     </p>
     <div class="hero-stat-row">
-      <div class="hero-stat"><div class="value down" data-counter="60062" data-prefix="$">$0</div><div class="label">Feb 5 Flash Crash Low</div></div>
-      <div class="hero-stat"><div class="value neutral" id="heroCurrentPrice" data-counter="68605" data-prefix="$">$0</div><div class="label" id="heroCurrentLabel">Current Price (Feb 16)</div></div>
-      <div class="hero-stat"><div class="value down" data-counter="52" data-prefix="-" data-suffix=".4%">0</div><div class="label">Peak-to-Trough Decline</div></div>
-      <div class="hero-stat"><div class="value down" data-counter="5" data-prefix="F&amp;G: ">0</div><div class="label">All-Time Low Sentiment</div></div>
+      <div class="hero-stat"><div class="value down" data-counter="60062" data-prefix="$">$60,062</div><div class="label">Feb 5 Flash Crash Low</div></div>
+      <div class="hero-stat"><div class="value neutral" id="heroCurrentPrice" data-counter="68605" data-prefix="$">$68,605</div><div class="label" id="heroCurrentLabel">Current Price (Feb 16)</div></div>
+      <div class="hero-stat"><div class="value down" data-counter="52" data-prefix="-" data-suffix=".4%">-52.4%</div><div class="label">Peak-to-Trough Decline</div></div>
+      <div class="hero-stat"><div class="value down" data-counter="5" data-prefix="F&amp;G: ">F&amp;G: 5</div><div class="label">All-Time Low Sentiment</div></div>
     </div>
     <p class="hero-date">All data frozen as of February 16, 2026 &middot; 30+ sources cross-referenced &middot; 21 interactive charts &middot; On-chain data from Glassnode</p>
   </div>
@@ -2126,7 +2128,7 @@ footer a:hover {
       <p class="section-desc">What the blockchain data says about market positioning, sentiment, and historical cycle alignment.</p>
     </div>
     <div class="stat-grid reveal">
-      <div class="stat-card info"><div class="stat-value">1.32</div><div class="stat-label">MVRV Z-Score</div><div class="stat-detail">Fair value zone. Overheated >7, bottom &lt;0</div></div>
+      <div class="stat-card info"><div class="stat-value">0.47</div><div class="stat-label">MVRV Z-Score</div><div class="stat-detail">Approaching bottom zone. Overheated >7, bottom &lt;0</div></div>
       <div class="stat-card warn"><div class="stat-value">55%</div><div class="stat-label">Supply in Profit</div><div class="stat-detail">45% in loss, approaching convergence (bottom signal)</div></div>
       <div class="stat-card info"><div class="stat-value">Anxiety</div><div class="stat-label">NUPL Phase</div><div class="stat-detail">Fell from Euphoria (Oct) to Anxiety (Feb)</div></div>
       <div class="stat-card bull"><div class="stat-value">Active</div><div class="stat-label">Hash Ribbons Signal</div><div class="stat-detail">Capitulation signal, historically a bullish contrarian indicator</div></div>
@@ -2159,8 +2161,8 @@ footer a:hover {
     </div>
     <div class="stat-grid reveal">
       <div class="stat-card info"><div class="stat-value">~45</div><div class="stat-label">NVT Ratio</div><div class="stat-detail">Below 30 historically signals undervaluation</div></div>
-      <div class="stat-card bull"><div class="stat-value">2.4-2.8M</div><div class="stat-label">Exchange Reserves (BTC)</div><div class="stat-detail">Lowest since 2018, declining steadily per Glassnode data</div></div>
-      <div class="stat-card bull"><div class="stat-value">0.30</div><div class="stat-label">Risk Metric (Cowen)</div><div class="stat-detail">Buy zone below 0.3, sell zone above 0.7. At the threshold.</div></div>
+      <div class="stat-card bull"><div class="stat-value">1.72M</div><div class="stat-label">Exchange Reserves (BTC)</div><div class="stat-detail">Lowest since 2018, declining from 2.4M (Jan 2024) per Glassnode data</div></div>
+      <div class="stat-card bull"><div class="stat-value">0.28</div><div class="stat-label">Risk Metric (Cowen)</div><div class="stat-detail">Buy zone below 0.3, sell zone above 0.7. Currently in buy zone.</div></div>
     </div>
     <div class="chart-container reveal">
       <h3>NVT Ratio: Network Value to Transactions</h3>
@@ -3657,7 +3659,7 @@ createChartOnReveal('diminishingDrawdownChart', function(ctx) {
             },
             currentLabel: {
               type: 'label', xValue: 4, yValue: -52,
-              content: ['Current: -52%', 'Price: $60,062'],
+              content: ['Max Drawdown: -52%', 'Low: $60,062'],
               backgroundColor: 'rgba(59,130,246,0.15)', color: '#3b82f6',
               font: { family: "'JetBrains Mono'", size: 10, weight: '600' },
               padding: { top: 4, bottom: 4, left: 8, right: 8 }, borderRadius: 4, yAdjust: -30
@@ -5184,19 +5186,22 @@ document.querySelectorAll('.nav-links a').forEach(function(a) {
       });
     }, REFRESH_INTERVAL);
 
-    // Check for stale data every 30s (stored for cleanup)
+    // Check for stale data every 30s
     var staleTimer = setInterval(checkStale, 30000);
 
     // Pause refresh when tab is hidden, resume when visible
     document.addEventListener('visibilitychange', function() {
       if (document.hidden) {
         clearInterval(refreshTimer);
+        clearInterval(staleTimer);
       } else {
         clearInterval(refreshTimer); // Prevent duplicate intervals on rapid tab switching
+        clearInterval(staleTimer);
         fetchAllData().catch(function() {});
         refreshTimer = setInterval(function() {
           fetchAllData().catch(function() { checkStale(); });
         }, REFRESH_INTERVAL);
+        staleTimer = setInterval(checkStale, 30000);
       }
     });
   }
