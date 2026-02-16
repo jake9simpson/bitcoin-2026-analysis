@@ -83,7 +83,7 @@
 /* ---- Base ---- */
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 110px;
+  scroll-padding-top: 130px;
   font-size: 16px;
 }
 
@@ -506,12 +506,52 @@ body {
 }
 
 /* ===========================================================
+   SNAPSHOT BANNER — point-in-time indicator
+   =========================================================== */
+.snapshot-banner {
+  background: linear-gradient(90deg, rgba(247, 147, 26, 0.06) 0%, rgba(247, 147, 26, 0.12) 50%, rgba(247, 147, 26, 0.06) 100%);
+  border-bottom: 1px solid rgba(247, 147, 26, 0.15);
+  padding: 10px 24px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  margin-top: 100px; /* Clear fixed nav (64px) + ticker (36px) */
+}
+
+.snapshot-banner strong {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.snapshot-banner .snapshot-date {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.snapshot-banner .snapshot-sep {
+  color: var(--text-muted);
+  margin: 0 8px;
+}
+
+@media (max-width: 600px) {
+  .snapshot-banner {
+    font-size: 0.75rem;
+    padding: 8px 16px;
+  }
+}
+
+/* ===========================================================
    LAYOUT
    =========================================================== */
 section {
   padding: var(--space-15) var(--space-3);
   position: relative;
-  scroll-margin-top: 108px;
+  scroll-margin-top: 130px;
 }
 
 section:first-of-type {
@@ -544,15 +584,21 @@ section:first-of-type {
   margin: 0 auto 64px;
   text-align: center;
   padding: 48px 32px;
-  scroll-margin-top: 108px;
+  scroll-margin-top: 130px;
 }
 
-/* First chapter intro needs extra top padding to clear the fixed navbar + ticker */
+/* First chapter intro needs extra top padding to clear the fixed navbar + ticker + snapshot banner */
 .nav + .section-divider + .chapter-intro {
-  padding-top: 120px;
+  padding-top: 60px;
 }
 .nav + .live-ticker + .section-divider + .chapter-intro {
-  padding-top: 120px;
+  padding-top: 60px;
+}
+.nav + .live-ticker + .snapshot-banner + .section-divider + .chapter-intro {
+  padding-top: 60px;
+}
+.snapshot-banner + .section-divider + .chapter-intro {
+  padding-top: 60px;
 }
 
 .chapter-number {
@@ -596,7 +642,7 @@ section:first-of-type {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding-top: 110px;
+  padding-top: 140px;
   background:
     linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, transparent 50%),
     radial-gradient(ellipse at 50% 0%, rgba(247, 147, 26, 0.07) 0%, transparent 60%),
@@ -1686,6 +1732,11 @@ footer a:hover {
   </div>
 </div>
 
+<!-- SNAPSHOT BANNER — frozen-in-time indicator -->
+<div class="snapshot-banner" id="snapshotBanner">
+  <strong>POINT-IN-TIME ANALYSIS</strong><span class="snapshot-sep">&middot;</span>All data, charts, and commentary reflect market conditions as of <span class="snapshot-date">February 16, 2026</span><span class="snapshot-sep">&middot;</span>Live ticker shows current prices for reference only
+</div>
+
 <!-- CHAPTER 01: THE STORY -->
 <div class="section-divider"></div>
 <div class="chapter-intro">
@@ -1696,7 +1747,7 @@ footer a:hover {
 <!-- 1. HERO -->
 <section class="hero" id="hero">
   <div class="hero-content">
-    <div class="hero-badge"><span class="pulse-dot"></span> Live Analysis | February 16, 2026</div>
+    <div class="hero-badge"><span class="pulse-dot"></span> Analysis Snapshot &middot; February 16, 2026</div>
     <h1>Bitcoin's <span class="highlight">-52.4%</span><br>Drawdown Decoded</h1>
     <p style="color:var(--text-secondary);font-size:1.15rem;max-width:660px;margin:0 auto;line-height:1.7">
       From an all-time high of $126,198 to a flash-crash low of $60,062. A full, data-driven breakdown of what happened, why it happened, and what comes next.
@@ -1707,7 +1758,7 @@ footer a:hover {
       <div class="hero-stat"><div class="value down" data-counter="52" data-prefix="-" data-suffix=".4%">0</div><div class="label">Decline from ATH</div></div>
       <div class="hero-stat"><div class="value down" data-counter="5" data-prefix="F&amp;G: ">0</div><div class="label">All-Time Low Sentiment</div></div>
     </div>
-    <p class="hero-date">Analysis compiled February 16, 2026 &middot; 30+ sources cross-referenced &middot; 21 interactive charts &middot; On-chain data from Glassnode</p>
+    <p class="hero-date">All data frozen as of February 16, 2026 &middot; 30+ sources cross-referenced &middot; 21 interactive charts &middot; On-chain data from Glassnode</p>
   </div>
   <div class="scroll-indicator">
     Scroll to explore
@@ -4870,7 +4921,7 @@ document.querySelectorAll('.nav-links a').forEach(function(a) {
     marketCap: document.getElementById('tickerMarketCap'),
     fearGreed: document.getElementById('tickerFearGreed'),
     dominance: document.getElementById('tickerDominance'),
-    heroBadge: document.querySelector('.hero-badge')
+    heroBadge: null // Hero badge shows static snapshot date — not modified by live data
   };
 
   // --- Utility formatters ---
@@ -4938,21 +4989,8 @@ document.querySelectorAll('.nav-links a').forEach(function(a) {
       els.dominance.textContent = data.dominance.toFixed(1) + '%';
     }
 
-    // Update hero badge with live timestamp
-    if (els.heroBadge) {
-      els.heroBadge.innerHTML = '<span class="pulse-dot"></span> Live Data &middot; Updated ' + fmtTime(new Date());
-    }
-
-    // Update hero current price stat with live data
-    var heroPrice = document.getElementById('heroCurrentPrice');
-    var heroLabel = document.getElementById('heroCurrentLabel');
-    if (heroPrice && data.price) {
-      heroPrice.textContent = '$' + Math.round(data.price).toLocaleString();
-      heroPrice.className = 'value ' + (data.change24h >= 0 ? 'neutral' : 'down');
-    }
-    if (heroLabel) {
-      heroLabel.textContent = 'Live Price (' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ')';
-    }
+    // Hero badge always shows the analysis snapshot date — do NOT overwrite
+    // Live data is shown in the ticker bar, not in the hero badge
 
     lastUpdate = Date.now();
     setStatus('live', 'Live · ' + fmtTime(new Date()));
