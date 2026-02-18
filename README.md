@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bitcoin 2026 Analysis
 
-## Getting Started
+Analysis of Bitcoin's 52% drawdown from $126,198 to $60,062, with interactive charts, on-chain metrics, and cycle comparisons.
 
-First, run the development server:
+Live at **https://bitcoin-2026-analysis.vercel.app**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Structure
+
+```
+website/index.html   # Self-contained page (inline CSS + JS)
+research/            # 13 markdown files covering cycle, macro, and institutional analysis
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The site is a single HTML file. No build step, no framework, no dependencies to install. Chart.js, ApexCharts, and TradingView Lightweight Charts load from CDNs.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What's in it
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Interactive price and drawdown charts
+- On-chain metrics (MVRV, SOPR, exchange flows)
+- Historical cycle comparisons (2018, 2022, current)
+- Institutional positioning and insider quotes
+- Risk assessment framework
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
+Static deployment on Vercel. `vercel.json` handles the config (serves from `website/`, no build step).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To run locally, open `website/index.html` in a browser or serve it however you like:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npx serve website
+```
 
-## Deploy on Vercel
+## Research
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The `research/` directory has the source material: cycle analysis, macro conditions, institutional flows, technical indicators, and more. Thirteen files total, all markdown.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Design
+
+Dark theme with Bitcoin orange (#F7931A) accents. Responsive layout. Charts are interactive on desktop and degrade gracefully on mobile.
